@@ -34,19 +34,7 @@ import retrofit2.http.GET
         .baseUrl(BASE_URL)
         .build()
 
-    /**
-     * Retrofit service object for creating api calls
-     */
-    interface MarsApiService {
-        @GET("photos")
-        suspend fun getPhotos(): List<MarsPhoto>
-    }
-
-    /**
-     * A public Api object that exposes the lazy-initialized Retrofit service
-     */
-    object MarsApi {
-        val retrofitService: MarsApiService by lazy {
-            retrofit.create(MarsApiService::class.java)
-        }
+interface MarsApiService {
+    @GET("photos")
+    suspend fun getPhotos(): List<MarsPhoto>
 }
