@@ -32,7 +32,8 @@ fun Navigation() {
             DetailScreenContent(
                 photo = MarsPhoto(id = detailScreen.photoId, imgSrc = detailScreen.imgSrc),
                 detailUiState = detailViewModel.uiState,
-                onPhotoClicked = detailViewModel::incrementCounter
+                onPhotoClicked = detailViewModel::incrementCounter,
+                onNavigateBack = { navController.navigateUp() }
             )
         }
     }

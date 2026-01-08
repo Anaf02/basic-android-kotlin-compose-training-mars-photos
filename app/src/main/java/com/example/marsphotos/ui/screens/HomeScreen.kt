@@ -45,6 +45,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.marsphotos.R
 import com.example.marsphotos.model.MarsPhoto
+import com.example.marsphotos.ui.components.PhotosGridScreen
 import com.example.marsphotos.ui.theme.MarsPhotosTheme
 
 @Composable
@@ -67,59 +68,6 @@ fun HomeScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MarsPhotoCard(
-    photo: MarsPhoto,
-    modifier: Modifier = Modifier,
-    onClick: (MarsPhoto) -> Unit
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        onClick = { onClick(photo) }
-    ) {
-        ImgSrcToPhoto(photo.imgSrc, Modifier.fillMaxSize())
-    }
-}
-
-@Composable
-fun ImgSrcToPhoto(imgSrc: String, modifier: Modifier) {
-    AsyncImage(
-        model = ImageRequest.Builder(context = LocalContext.current)
-            .data(imgSrc)
-            .crossfade(true)
-            .build(),
-        contentDescription = stringResource(R.string.mars_photo),
-        contentScale = ContentScale.Crop,
-        error = painterResource(R.drawable.ic_broken_image),
-        placeholder = painterResource(R.drawable.loading_img),
-        modifier = modifier,
-    )
-}
-
-@Composable
-fun PhotosGridScreen(
-    photos: List<MarsPhoto>,
-    modifier: Modifier = Modifier,
-    onCellClicked: (MarsPhoto) -> Unit
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(150.dp),
-        modifier = modifier.padding(horizontal = 4.dp),
-    ) {
-        items(items = photos, key = { photo -> photo.id }) { photo ->
-            MarsPhotoCard(
-                photo,
-                modifier = modifier
-                    .padding(4.dp)
-                    .fillMaxWidth()
-                    .aspectRatio(1.5f),
-                onClick = { onCellClicked(photo) }
-            )
-        }
-    }
-}
 
 /**
  * The home screen displaying the loading message.
