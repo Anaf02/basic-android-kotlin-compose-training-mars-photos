@@ -34,11 +34,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.marsphotos.R
-import com.example.marsphotos.ui.screens.HomeScreen
+import com.example.marsphotos.model.MarsPhoto
+import com.example.marsphotos.ui.screens.HomeScreenContent
 import com.example.marsphotos.ui.screens.MarsViewModel
 
 @Composable
-fun MarsPhotosApp() {
+fun MarsPhotosApp(onNavigateToDetail: (MarsPhoto) -> Unit) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -51,9 +52,10 @@ fun MarsPhotosApp() {
         ) {
             val marsViewModel: MarsViewModel =
                 viewModel(factory = MarsViewModel.Factory)
-            HomeScreen(
+            HomeScreenContent(
                 marsUiState = marsViewModel.marsUiState,
-                retryAction = marsViewModel::getMarsPhotos
+                retryAction = marsViewModel::getMarsPhotos,
+                onNavigateToDetail = onNavigateToDetail
             )
         }
     }
