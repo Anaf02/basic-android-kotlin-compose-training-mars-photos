@@ -1,26 +1,26 @@
 package com.example.marsphotos.fake
 
-import com.example.marsphotos.ui.screens.MarsUiState
-import com.example.marsphotos.ui.screens.MarsViewModel
+import com.example.marsphotos.ui.screens.home.HomeUiState
+import com.example.marsphotos.ui.screens.home.HomeViewModel
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import rules.TestDispatcherRule
 
-class MarsViewModelTest {
+class HomeViewModelTest {
     @get:Rule
     val testDispatcher = TestDispatcherRule()
 
     @Test
-    fun marsViewModel_getMarsPhotos_verifyMarsUiStateSuccess() =
+    fun homeViewModel_getMarsPhotos_verifyHomeUiStateSuccess() =
         runTest {
-            val marsViewModel = MarsViewModel(
+            val homeViewModel = HomeViewModel(
                 marsPhotosRepository = FakeNetworkMarsPhotosRepository()
             )
             assertEquals(
-                MarsUiState.Success(FakeDataSource.photosList),
-                marsViewModel.marsUiState
+                HomeUiState.Success(FakeDataSource.photosList),
+                homeViewModel.homeUiState
             )
         }
 }

@@ -13,65 +13,81 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.marsphotos.ui.screens
+package com.example.marsphotos.ui.screens.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.marsphotos.R
 import com.example.marsphotos.model.MarsPhoto
 import com.example.marsphotos.ui.components.PhotosGridScreen
+import com.example.marsphotos.ui.components.TopAppBar
 import com.example.marsphotos.ui.theme.MarsPhotosTheme
+import org.koin.androidx.compose.koinViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(
+    onNavigateToDetail: (MarsPhoto) -> Unit
+) {
+    val viewModel = koinViewModel<HomeViewModel>()
+    val uiState: HomeUiState = viewModel.homeUiState
+    val retryAction: () -> Unit = viewModel::getMarsPhotos
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(R.string.app_name)
+            )
+        }
+    ) { contentPadding ->
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+        ) {
+            HomeScreenContent(uiState, retryAction, onNavigateToDetail)
+        }
+    }
+}
 
 @Composable
 fun HomeScreenContent(
-    marsUiState: MarsUiState,
+    homeUiState: HomeUiState,
     retryAction: () -> Unit,
-    modifier: Modifier = Modifier,
-    onNavigateToDetail: (MarsPhoto) -> Unit
+    onNavigateToDetail: (MarsPhoto) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    when (marsUiState) {
-        is MarsUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is MarsUiState.Success -> PhotosGridScreen(
-            marsUiState.photos,
+    when (homeUiState) {
+        is HomeUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
+        is HomeUiState.Success -> PhotosGridScreen(
+            homeUiState.photos,
             modifier,
             onCellClicked = { marsPhoto ->
                 onNavigateToDetail(marsPhoto)
             })
 
-        is MarsUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+        is HomeUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
     }
 }
 
 
-/**
- * The home screen displaying the loading message.
- */
 @Composable
 fun LoadingScreen(modifier: Modifier = Modifier) {
     Image(
@@ -81,9 +97,6 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
     )
 }
 
-/**
- * The home screen displaying error message with re-attempt button.
- */
 @Composable
 fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
     Column(
@@ -101,9 +114,6 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-/**
- * ResultScreen displaying number of photos retrieved.
- */
 @Composable
 fun ResultScreen(photos: String, modifier: Modifier = Modifier) {
     Box(
