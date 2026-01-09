@@ -16,7 +16,7 @@ private const val BASE_URL = "https://android-kotlin-fun-mars-server.appspot.com
 
 val appModule = module {
 
-    single {
+    single<Retrofit> {
         Retrofit.Builder()
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .baseUrl(BASE_URL)
@@ -35,7 +35,7 @@ val appModule = module {
         HomeViewModel(get())
     }
 
-    viewModel {
-        DetailViewModel()
+    viewModel { (photoId: String, imageUrl: String) ->
+        DetailViewModel(photoId, imageUrl)
     }
 }

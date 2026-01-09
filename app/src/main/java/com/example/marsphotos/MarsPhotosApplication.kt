@@ -9,7 +9,7 @@ class MarsPhotosApplication : Application() {
         super.onCreate()
 
         startKoin {
-            androidContext(this@MarsPhotosApplication)
+            androidContext(applicationContext)
             modules(appModule)
         }
     }

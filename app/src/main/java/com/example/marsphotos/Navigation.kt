@@ -12,21 +12,22 @@ import kotlinx.serialization.Serializable
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
+
     NavHost(
         navController = navController,
-        startDestination = HomeScreen
+        startDestination = HomeRoute
     ) {
-        composable<HomeScreen> {
+        composable<HomeRoute> {
             HomeScreen(onNavigateToDetail = { (photoId, imgSrc) ->
-                navController.navigate(DetailScreen(photoId, imgSrc))
+                navController.navigate(DetailsRoute(photoId, imgSrc))
             })
         }
-        composable<DetailScreen> { backStackEntry ->
-            val detailScreen: DetailScreen = backStackEntry.toRoute()
+        composable<DetailsRoute> { backStackEntry ->
+            val detailsRoute = backStackEntry.toRoute<DetailsRoute>()
 
             DetailScreen(
-                photoId = detailScreen.photoId,
-                imgSrc = detailScreen.imgSrc,
+                photoId = detailsRoute.photoId,
+                imgSrc = detailsRoute.imgSrc,
                 onNavigateBack = { navController.navigateUp() }
             )
         }
@@ -34,7 +35,7 @@ fun Navigation() {
 }
 
 @Serializable
-object HomeScreen
+object HomeRoute
 
 @Serializable
-data class DetailScreen(val photoId: String, val imgSrc: String)
+data class DetailsRoute(val photoId: String, val imgSrc: String)
