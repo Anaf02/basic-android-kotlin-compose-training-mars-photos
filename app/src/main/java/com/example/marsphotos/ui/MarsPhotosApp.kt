@@ -28,12 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.marsphotos.R
 import com.example.marsphotos.model.MarsPhoto
 import com.example.marsphotos.ui.components.TopAppBar
 import com.example.marsphotos.ui.screens.HomeScreenContent
 import com.example.marsphotos.ui.screens.MarsViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MarsPhotosApp(onNavigateToDetail: (MarsPhoto) -> Unit) {
@@ -52,8 +52,7 @@ fun MarsPhotosApp(onNavigateToDetail: (MarsPhoto) -> Unit) {
                 .fillMaxSize()
                 .padding(contentPadding)
         ) {
-            val marsViewModel: MarsViewModel =
-                viewModel(factory = MarsViewModel.Factory)
+            val marsViewModel = koinViewModel<MarsViewModel>()
             HomeScreenContent(
                 marsUiState = marsViewModel.marsUiState,
                 retryAction = marsViewModel::getMarsPhotos,

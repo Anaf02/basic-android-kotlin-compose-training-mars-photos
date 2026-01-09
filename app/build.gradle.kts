@@ -91,6 +91,9 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.8.4")
 
+    implementation("io.insert-koin:koin-android:3.5.6")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.6")
+
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
