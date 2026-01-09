@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.marsphotos.ui.screens
+package com.example.marsphotos.ui.screens.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,42 +26,29 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-/**
- * UI state for the Home screen
- */
-sealed interface MarsUiState {
-    data class Success(val photos: List<MarsPhoto>) : MarsUiState
-    object Error : MarsUiState
-    object Loading : MarsUiState
+sealed interface HomeUiState {
+    data class Success(val photos: List<MarsPhoto>) : HomeUiState
+    object Error : HomeUiState
+    object Loading : HomeUiState
 }
 
-class MarsViewModel(private val marsPhotosRepository: MarsPhotosRepository) : ViewModel() {
-    /** The mutable State that stores the status of the most recent request */
-    var marsUiState: MarsUiState by mutableStateOf(MarsUiState.Loading)
+class HomeViewModel(private val marsPhotosRepository: MarsPhotosRepository) : ViewModel() {
+    var homeUiState: HomeUiState by mutableStateOf(HomeUiState.Loading)
         private set
 
-    /**
-     * Call getMarsPhotos() on init so we can display status immediately.
-     */
     init {
         getMarsPhotos()
     }
 
-    /**
-     * Gets Mars photos information from the Mars API Retrofit service and updates the
-     * [MarsPhoto] [List] [MutableList].
-     */
     fun getMarsPhotos() {
         viewModelScope.launch {
-            marsUiState = MarsUiState.Loading
-            marsUiState = try {
-                marsPhotosRepository.getMarsPhotos()
-                marsPhotosRepository.getMarsPhotos()[0]
-                MarsUiState.Success(marsPhotosRepository.getMarsPhotos())
+            homeUiState = HomeUiState.Loading
+            homeUiState = try {
+                HomeUiState.Success(marsPhotosRepository.getMarsPhotos())
             } catch (_: IOException) {
-                MarsUiState.Error
+                HomeUiState.Error
             } catch (_: HttpException) {
-                MarsUiState.Error
+                HomeUiState.Error
             }
         }
     }
