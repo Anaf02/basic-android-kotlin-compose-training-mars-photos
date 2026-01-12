@@ -26,5 +26,5 @@ import kotlinx.serialization.Serializable
 data class MarsPhoto(
     val id: String,
     @SerialName(value = "img_src")
-    val imgSrc: String
+    val imageUrl: String
 )

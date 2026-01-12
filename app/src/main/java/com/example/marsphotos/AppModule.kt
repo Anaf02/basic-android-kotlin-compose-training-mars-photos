@@ -3,7 +3,7 @@ package com.example.marsphotos
 import com.example.marsphotos.data.MarsPhotosRepository
 import com.example.marsphotos.data.NetworkMarsPhotosRepository
 import com.example.marsphotos.network.MarsApiService
-import com.example.marsphotos.ui.screens.detail.DetailViewModel
+import com.example.marsphotos.ui.screens.details.DetailsViewModel
 import com.example.marsphotos.ui.screens.home.HomeViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -35,7 +35,7 @@ val appModule = module {
         HomeViewModel(get())
     }
 
-    viewModel { (photoId: String, imageUrl: String) ->
-        DetailViewModel(photoId, imageUrl)
+    viewModel {
+        DetailsViewModel()
     }
 }

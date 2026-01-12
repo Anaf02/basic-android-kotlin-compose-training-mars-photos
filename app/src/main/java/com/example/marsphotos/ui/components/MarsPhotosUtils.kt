@@ -35,15 +35,15 @@ fun MarsPhotoCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         onClick = { onClick(photo) }
     ) {
-        ImgSrcToPhoto(photo.imgSrc, Modifier.fillMaxSize())
+        ImageUrlToPhoto(photo.imageUrl, Modifier.fillMaxSize())
     }
 }
 
 @Composable
-fun ImgSrcToPhoto(imgSrc: String, modifier: Modifier) {
+fun ImageUrlToPhoto(imageUrl: String, modifier: Modifier) {
     AsyncImage(
         model = ImageRequest.Builder(context = LocalContext.current)
-            .data(imgSrc)
+            .data(imageUrl)
             .crossfade(true)
             .build(),
         contentDescription = stringResource(R.string.mars_photo),

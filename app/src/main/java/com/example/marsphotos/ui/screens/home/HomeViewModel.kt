@@ -15,40 +15,41 @@
  */
 package com.example.marsphotos.ui.screens.home
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.marsphotos.data.MarsPhotosRepository
-import com.example.marsphotos.model.MarsPhoto
+import com.example.marsphotos.ui.BaseViewModel
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
-sealed interface HomeUiState {
-    data class Success(val photos: List<MarsPhoto>) : HomeUiState
-    object Error : HomeUiState
-    object Loading : HomeUiState
-}
+class HomeViewModel(
+    private val marsPhotosRepository: MarsPhotosRepository
+) : BaseViewModel<HomeContract.HomeAction, HomeContract.HomeState, HomeContract.HomeEffect>() {
 
-class HomeViewModel(private val marsPhotosRepository: MarsPhotosRepository) : ViewModel() {
-    var homeUiState: HomeUiState by mutableStateOf(HomeUiState.Loading)
-        private set
+    override fun setInitialState() = HomeContract.HomeState()
 
     init {
         getMarsPhotos()
     }
 
-    fun getMarsPhotos() {
+    override fun handleViewAction(action: HomeContract.HomeAction) {
+        when (action) {
+            is HomeContract.HomeAction.OnPhotoClicked -> {
+                setEffect { HomeContract.HomeEffect.NavigateToDetails(action.photo) }
+            }
+
+            is HomeContract.HomeAction.LoadPhotos -> {
+                getMarsPhotos()
+            }
+        }
+    }
+
+    private fun getMarsPhotos() {
         viewModelScope.launch {
-            homeUiState = HomeUiState.Loading
-            homeUiState = try {
-                HomeUiState.Success(marsPhotosRepository.getMarsPhotos())
-            } catch (_: IOException) {
-                HomeUiState.Error
-            } catch (_: HttpException) {
-                HomeUiState.Error
+            setState { copy(isLoading = true, error = null) }
+            try {
+                val photos = marsPhotosRepository.getMarsPhotos()
+                setState { copy(isLoading = false, photos = photos) }
+            } catch (e: Exception) {
+                setState { copy(isLoading = false, error = e.message) }
             }
         }
     }
