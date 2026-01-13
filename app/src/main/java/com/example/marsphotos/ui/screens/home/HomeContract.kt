@@ -15,7 +15,7 @@ interface HomeContract {
     data class HomeState(
         val photos: List<MarsPhoto> = emptyList(),
         val isLoading: Boolean = true,
-        val error: String? = ""
+        val error: String? = null
     ) : UiState
 
     sealed class HomeEffect : ViewSideEffect {

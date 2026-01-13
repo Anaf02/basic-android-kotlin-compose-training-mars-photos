@@ -28,12 +28,12 @@ import com.example.marsphotos.model.MarsPhoto
 fun MarsPhotoCard(
     photo: MarsPhoto,
     modifier: Modifier = Modifier,
-    onClick: (MarsPhoto) -> Unit
+    onClick: () -> Unit
 ) {
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        onClick = { onClick(photo) }
+        onClick = onClick
     ) {
         ImageUrlToPhoto(photo.imageUrl, Modifier.fillMaxSize())
     }
