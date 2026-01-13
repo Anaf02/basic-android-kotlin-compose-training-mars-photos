@@ -28,18 +28,7 @@ fun DetailsScreen(
     navigateBack: () -> Unit,
 ) {
     val viewModel = koinViewModel<DetailsViewModel>()
-    val uiState: DetailsContract.DetailsState =
-        viewModel.uiState.collectAsStateWithLifecycle().value
-
-    HandleEffects(
-        effects = viewModel.effect,
-        handleEffect = {
-            handleEffect(
-                effect = it,
-                navigateBack = { viewModel.setAction(DetailsContract.DetailsAction.NavigateBack) }
-            )
-        }
-    )
+    val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     Scaffold(
         topBar = {
@@ -58,10 +47,20 @@ fun DetailsScreen(
             DetailScreenContent(
                 photoId = photoId,
                 imageUrl = imageUrl,
-                state = uiState,
+                state = state,
                 setAction = viewModel::setAction
             )
         }
+
+        HandleEffects(
+            effects = viewModel.effect,
+            handleEffect = {
+                handleEffect(
+                    effect = it,
+                    navigateBack = { viewModel.setAction(DetailsContract.DetailsAction.NavigateBack) }
+                )
+            }
+        )
     }
 }
 

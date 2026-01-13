@@ -49,17 +49,7 @@ fun HomeScreen(
     navigateToDetails: (MarsPhoto) -> Unit
 ) {
     val viewModel = koinViewModel<HomeViewModel>()
-    val uiState: HomeContract.HomeState = viewModel.uiState.collectAsStateWithLifecycle().value
-
-    HandleEffects(
-        effects = viewModel.effect,
-        handleEffect = {
-            handleEffect(
-                effect = it,
-                navigateToDetails = navigateToDetails
-            )
-        }
-    )
+    val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     Scaffold(
         topBar = {
@@ -74,10 +64,21 @@ fun HomeScreen(
                 .padding(contentPadding)
         ) {
             HomeScreenContent(
-                state = uiState,
+                state = state,
                 setAction = viewModel::setAction
             )
         }
+
+        HandleEffects(
+            effects = viewModel.effect,
+            handleEffect = {
+                handleEffect(
+                    effect = it,
+                    navigateToDetails = navigateToDetails
+                )
+            }
+        )
+
     }
 }
 
@@ -97,7 +98,7 @@ fun HomeScreenContent(
         else -> PhotosGridScreen(
             photos = state.photos,
             modifier = modifier,
-            onCellClicked = { marsPhoto ->
+            onClick = { marsPhoto ->
                 setAction(HomeContract.HomeAction.OnPhotoClicked(marsPhoto))
             })
     }
@@ -169,6 +170,6 @@ fun ErrorScreenPreview() {
 fun PhotosGridScreenPreview() {
     MarsPhotosTheme {
         val mockData = List(10) { MarsPhoto("$it", "") }
-        PhotosGridScreen(mockData, onCellClicked = {})
+        PhotosGridScreen(mockData, onClick = {})
     }
 }

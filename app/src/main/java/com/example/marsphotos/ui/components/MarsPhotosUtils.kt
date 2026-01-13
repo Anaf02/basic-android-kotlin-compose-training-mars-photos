@@ -58,7 +58,7 @@ fun ImageUrlToPhoto(imageUrl: String, modifier: Modifier) {
 fun PhotosGridScreen(
     photos: List<MarsPhoto>,
     modifier: Modifier = Modifier,
-    onCellClicked: (MarsPhoto) -> Unit
+    onClick: (MarsPhoto) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(150.dp),
@@ -71,7 +71,7 @@ fun PhotosGridScreen(
                     .padding(4.dp)
                     .fillMaxWidth()
                     .aspectRatio(1.5f),
-                onClick = { onCellClicked(photo) }
+                onClick = { onClick(photo) }
             )
         }
     }
