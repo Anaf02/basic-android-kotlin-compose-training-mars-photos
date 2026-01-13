@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.marsphotos.ui.screens.detail.DetailScreen
+import com.example.marsphotos.ui.screens.details.DetailsScreen
 import com.example.marsphotos.ui.screens.home.HomeScreen
 import kotlinx.serialization.Serializable
 
@@ -18,17 +18,17 @@ fun Navigation() {
         startDestination = HomeRoute
     ) {
         composable<HomeRoute> {
-            HomeScreen(onNavigateToDetail = { (photoId, imgSrc) ->
-                navController.navigate(DetailsRoute(photoId, imgSrc))
+            HomeScreen(navigateToDetails = { (photoId, imageUrl) ->
+                navController.navigate(DetailsRoute(photoId, imageUrl))
             })
         }
         composable<DetailsRoute> { backStackEntry ->
             val detailsRoute = backStackEntry.toRoute<DetailsRoute>()
 
-            DetailScreen(
+            DetailsScreen(
                 photoId = detailsRoute.photoId,
-                imgSrc = detailsRoute.imgSrc,
-                onNavigateBack = { navController.navigateUp() }
+                imageUrl = detailsRoute.imageUrl,
+                navigateBack = { navController.navigateUp() }
             )
         }
     }
@@ -38,4 +38,4 @@ fun Navigation() {
 object HomeRoute
 
 @Serializable
-data class DetailsRoute(val photoId: String, val imgSrc: String)
+data class DetailsRoute(val photoId: String, val imageUrl: String)

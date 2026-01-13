@@ -11,11 +11,11 @@ object FakeDataSource {
     val photosList = listOf(
         MarsPhoto(
             id = idOne,
-            imgSrc = imgOne
+            imageUrl = imgOne
         ),
         MarsPhoto(
             id = idTwo,
-            imgSrc = imgTwo
+            imageUrl = imgTwo
         )
     )
 }

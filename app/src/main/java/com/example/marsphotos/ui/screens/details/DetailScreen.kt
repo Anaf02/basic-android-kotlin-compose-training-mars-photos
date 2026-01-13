@@ -1,4 +1,4 @@
-package com.example.marsphotos.ui.screens.detail
+package com.example.marsphotos.ui.screens.details
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,29 +15,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.marsphotos.model.MarsPhoto
+import com.example.marsphotos.ui.HandleEffects
 import com.example.marsphotos.ui.components.MarsPhotoCard
 import com.example.marsphotos.ui.components.TopAppBar
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(
+fun DetailsScreen(
     photoId: String,
-    imgSrc: String,
-    onNavigateBack: () -> Unit,
+    imageUrl: String,
+    navigateBack: () -> Unit,
 ) {
-    val viewModel = koinViewModel<DetailViewModel> { parametersOf(photoId, imgSrc) }
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-
-    val photo = MarsPhoto(id = photoId, imgSrc = imgSrc)
+    val viewModel = koinViewModel<DetailsViewModel>()
+    val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = "Image id: ${photo.id}",
+                title = "Image id: $photoId",
                 enableBackNavigation = true,
-                onNavigateBack = onNavigateBack
+                onNavigateBack = navigateBack
             )
         }
     ) { contentPadding ->
@@ -47,22 +45,36 @@ fun DetailScreen(
                 .padding(contentPadding)
         ) {
             DetailScreenContent(
-                state = uiState,
-                photo = photo,
-                onPhotoClicked = viewModel::incrementCounter
+                photoId = photoId,
+                imageUrl = imageUrl,
+                state = state,
+                setAction = viewModel::setAction
             )
         }
+
+        HandleEffects(
+            effects = viewModel.effect,
+            handleEffect = {
+                handleEffect(
+                    effect = it,
+                    navigateBack = { viewModel.setAction(DetailsContract.DetailsAction.NavigateBack) }
+                )
+            }
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreenContent(
-    state: DetailUiState,
-    photo: MarsPhoto,
-    onPhotoClicked: () -> Unit,
+    photoId: String,
+    imageUrl: String,
+    state: DetailsContract.DetailsState,
+    setAction: (DetailsContract.DetailsAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val photo = MarsPhoto(id = photoId, imageUrl = imageUrl)
+
     LazyColumn(
         modifier = Modifier
             .padding(10.dp)
@@ -72,7 +84,7 @@ fun DetailScreenContent(
             MarsPhotoCard(
                 photo = photo,
                 modifier = Modifier.aspectRatio(1.5f),
-                onClick = { onPhotoClicked() }
+                onClick = { setAction(DetailsContract.DetailsAction.IncrementCounter) }
             )
         }
         item {
@@ -82,5 +94,14 @@ fun DetailScreenContent(
                 modifier = modifier.fillMaxWidth()
             )
         }
+    }
+}
+
+private fun handleEffect(
+    effect: DetailsContract.DetailsEffect,
+    navigateBack: () -> Unit,
+) {
+    when (effect) {
+        is DetailsContract.DetailsEffect.NavigateBack -> navigateBack.invoke()
     }
 }

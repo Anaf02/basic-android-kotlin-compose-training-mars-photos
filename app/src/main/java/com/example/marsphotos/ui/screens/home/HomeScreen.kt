@@ -34,8 +34,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.marsphotos.R
 import com.example.marsphotos.model.MarsPhoto
+import com.example.marsphotos.ui.HandleEffects
 import com.example.marsphotos.ui.components.PhotosGridScreen
 import com.example.marsphotos.ui.components.TopAppBar
 import com.example.marsphotos.ui.theme.MarsPhotosTheme
@@ -44,11 +46,10 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onNavigateToDetail: (MarsPhoto) -> Unit
+    navigateToDetails: (MarsPhoto) -> Unit
 ) {
     val viewModel = koinViewModel<HomeViewModel>()
-    val uiState: HomeUiState = viewModel.homeUiState
-    val retryAction: () -> Unit = viewModel::getMarsPhotos
+    val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     Scaffold(
         topBar = {
@@ -62,31 +63,46 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(contentPadding)
         ) {
-            HomeScreenContent(uiState, retryAction, onNavigateToDetail)
+            HomeScreenContent(
+                state = state,
+                setAction = viewModel::setAction
+            )
         }
+
+        HandleEffects(
+            effects = viewModel.effect,
+            handleEffect = {
+                handleEffect(
+                    effect = it,
+                    navigateToDetails = navigateToDetails
+                )
+            }
+        )
+
     }
 }
 
 @Composable
 fun HomeScreenContent(
-    homeUiState: HomeUiState,
-    retryAction: () -> Unit,
-    onNavigateToDetail: (MarsPhoto) -> Unit,
+    state: HomeContract.HomeState,
+    setAction: (HomeContract.HomeAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    when (homeUiState) {
-        is HomeUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is HomeUiState.Success -> PhotosGridScreen(
-            homeUiState.photos,
-            modifier,
-            onCellClicked = { marsPhoto ->
-                onNavigateToDetail(marsPhoto)
-            })
+    when {
+        state.isLoading -> LoadingScreen(modifier = modifier.fillMaxSize())
+        state.error != null -> ErrorScreen(
+            retryAction = { setAction(HomeContract.HomeAction.LoadPhotos) },
+            modifier = modifier.fillMaxSize()
+        )
 
-        is HomeUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+        else -> PhotosGridScreen(
+            photos = state.photos,
+            modifier = modifier,
+            onClick = { marsPhoto ->
+                setAction(HomeContract.HomeAction.OnPhotoClicked(marsPhoto))
+            })
     }
 }
-
 
 @Composable
 fun LoadingScreen(modifier: Modifier = Modifier) {
@@ -124,6 +140,15 @@ fun ResultScreen(photos: String, modifier: Modifier = Modifier) {
     }
 }
 
+private fun handleEffect(
+    effect: HomeContract.HomeEffect,
+    navigateToDetails: (MarsPhoto) -> Unit,
+) {
+    when (effect) {
+        is HomeContract.HomeEffect.NavigateToDetails -> navigateToDetails.invoke(effect.photo)
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun LoadingScreenPreview() {
@@ -145,6 +170,6 @@ fun ErrorScreenPreview() {
 fun PhotosGridScreenPreview() {
     MarsPhotosTheme {
         val mockData = List(10) { MarsPhoto("$it", "") }
-        PhotosGridScreen(mockData, onCellClicked = {})
+        PhotosGridScreen(mockData, onClick = {})
     }
 }

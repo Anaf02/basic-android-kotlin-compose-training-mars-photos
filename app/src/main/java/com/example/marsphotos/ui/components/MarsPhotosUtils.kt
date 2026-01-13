@@ -28,22 +28,22 @@ import com.example.marsphotos.model.MarsPhoto
 fun MarsPhotoCard(
     photo: MarsPhoto,
     modifier: Modifier = Modifier,
-    onClick: (MarsPhoto) -> Unit
+    onClick: () -> Unit
 ) {
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        onClick = { onClick(photo) }
+        onClick = onClick
     ) {
-        ImgSrcToPhoto(photo.imgSrc, Modifier.fillMaxSize())
+        ImageUrlToPhoto(photo.imageUrl, Modifier.fillMaxSize())
     }
 }
 
 @Composable
-fun ImgSrcToPhoto(imgSrc: String, modifier: Modifier) {
+fun ImageUrlToPhoto(imageUrl: String, modifier: Modifier) {
     AsyncImage(
         model = ImageRequest.Builder(context = LocalContext.current)
-            .data(imgSrc)
+            .data(imageUrl)
             .crossfade(true)
             .build(),
         contentDescription = stringResource(R.string.mars_photo),
@@ -58,7 +58,7 @@ fun ImgSrcToPhoto(imgSrc: String, modifier: Modifier) {
 fun PhotosGridScreen(
     photos: List<MarsPhoto>,
     modifier: Modifier = Modifier,
-    onCellClicked: (MarsPhoto) -> Unit
+    onClick: (MarsPhoto) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(150.dp),
@@ -71,7 +71,7 @@ fun PhotosGridScreen(
                     .padding(4.dp)
                     .fillMaxWidth()
                     .aspectRatio(1.5f),
-                onClick = { onCellClicked(photo) }
+                onClick = { onClick(photo) }
             )
         }
     }
