@@ -11,7 +11,6 @@ class DetailsViewModel
     override fun handleViewAction(action: DetailsContract.DetailsAction) {
         when (action) {
             is DetailsContract.DetailsAction.IncrementCounter -> incrementCounter()
-            is DetailsContract.DetailsAction.NavigateBack -> setEffect { DetailsContract.DetailsEffect.NavigateBack }
         }
     }
 
