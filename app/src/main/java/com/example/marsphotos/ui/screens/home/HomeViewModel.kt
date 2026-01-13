@@ -18,10 +18,12 @@ package com.example.marsphotos.ui.screens.home
 import androidx.lifecycle.viewModelScope
 import com.example.marsphotos.data.MarsPhotosRepository
 import com.example.marsphotos.ui.BaseViewModel
-import kotlinx.coroutines.launch
+import com.example.marsphotos.ui.ErrorHandler
+import com.example.marsphotos.ui.runCoroutine
 
 class HomeViewModel(
-    private val marsPhotosRepository: MarsPhotosRepository
+    private val marsPhotosRepository: MarsPhotosRepository,
+    private val errorHandler: ErrorHandler
 ) : BaseViewModel<HomeContract.HomeAction, HomeContract.HomeState, HomeContract.HomeEffect>() {
 
     override fun setInitialState() = HomeContract.HomeState()
@@ -43,14 +45,14 @@ class HomeViewModel(
     }
 
     private fun getMarsPhotos() {
-        viewModelScope.launch {
-            setState { copy(isLoading = true, error = null) }
-            try {
+        runCoroutine(
+            coroutineScope = viewModelScope,
+            block = {
+                setState { copy(isLoading = true, error = null) }
                 val photos = marsPhotosRepository.getMarsPhotos()
                 setState { copy(isLoading = false, photos = photos) }
-            } catch (e: Exception) {
-                setState { copy(isLoading = false, error = e.message) }
-            }
-        }
+            },
+            errorHandler = errorHandler::onError
+        )
     }
 }
