@@ -23,11 +23,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -39,47 +37,36 @@ import com.example.marsphotos.R
 import com.example.marsphotos.model.MarsPhoto
 import com.example.marsphotos.ui.HandleEffects
 import com.example.marsphotos.ui.components.PhotosGridScreen
-import com.example.marsphotos.ui.components.TopAppBar
+import com.example.marsphotos.ui.components.TopAppBarState
 import com.example.marsphotos.ui.theme.MarsPhotosTheme
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    setTopAppBarState: (TopAppBarState) -> Unit,
     navigateToDetails: (MarsPhoto) -> Unit
 ) {
     val viewModel = koinViewModel<HomeViewModel>()
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = stringResource(R.string.app_name)
-            )
-        }
-    ) { contentPadding ->
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
-        ) {
-            HomeScreenContent(
-                state = state,
-                setAction = viewModel::setAction
-            )
-        }
-
-        HandleEffects(
-            effects = viewModel.effect,
-            handleEffect = {
-                handleEffect(
-                    effect = it,
-                    navigateToDetails = navigateToDetails
-                )
-            }
-        )
-
+    LaunchedEffect(key1 = Unit) {
+        setTopAppBarState(createTopAppBarState())
     }
+
+    HomeScreenContent(
+        state = state,
+        setAction = viewModel::setAction
+    )
+
+    HandleEffects(
+        effects = viewModel.effect,
+        handleEffect = {
+            handleEffect(
+                effect = it,
+                navigateToDetails = navigateToDetails
+            )
+        }
+    )
 }
 
 @Composable
@@ -148,6 +135,11 @@ private fun handleEffect(
         is HomeContract.HomeEffect.NavigateToDetails -> navigateToDetails.invoke(effect.photo)
     }
 }
+
+private fun createTopAppBarState() = TopAppBarState(
+    title = "Mars Photos",
+    shouldDisplayBackButton = false
+)
 
 @Preview(showBackground = true)
 @Composable
