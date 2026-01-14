@@ -1,43 +1,52 @@
 package com.example.marsphotos.ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBar(
-    title: String,
-    modifier: Modifier = Modifier,
-    enableBackNavigation: Boolean = false,
-    onNavigateBack: () -> Unit = { },
+    navController: NavController,
+    topAppBarState: State<TopAppBarState>,
+    modifier: Modifier = Modifier
 ) {
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = title,
-                style = MaterialTheme.typography.headlineSmall,
+                text = topAppBarState.value.title,
+                style = MaterialTheme.typography.headlineSmall
             )
         },
         modifier = modifier,
         navigationIcon = {
-            if (enableBackNavigation) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    modifier = Modifier
-                        .clickable { onNavigateBack() }
-                        .padding(horizontal = 16.dp)
-                )
+            AnimatedVisibility(
+                visible = topAppBarState.value.shouldDisplayBackButton,
+                enter = expandHorizontally(tween(durationMillis = 200, easing = LinearEasing)),
+                exit = shrinkHorizontally(tween(durationMillis = 200, easing = LinearEasing)),
+            ) {
+                IconButton(
+                    onClick = { topAppBarState.value.onNavigateBack(navController) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
             }
         }
     )

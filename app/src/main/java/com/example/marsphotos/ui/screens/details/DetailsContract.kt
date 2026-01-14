@@ -7,7 +7,6 @@ import com.example.marsphotos.ui.ViewSideEffect
 interface DetailsContract {
     sealed class DetailsAction() : ViewAction {
         data object IncrementCounter : DetailsAction()
-        data object NavigateBack : DetailsAction()
     }
 
     data class DetailsState(
@@ -15,6 +14,5 @@ interface DetailsContract {
     ) : UiState
 
     sealed class DetailsEffect() : ViewSideEffect {
-        data object NavigateBack : DetailsEffect()
     }
 }

@@ -3,6 +3,8 @@ package com.example.marsphotos
 import com.example.marsphotos.data.MarsPhotosRepository
 import com.example.marsphotos.data.NetworkMarsPhotosRepository
 import com.example.marsphotos.network.MarsApiService
+import com.example.marsphotos.ui.ErrorHandler
+import com.example.marsphotos.ui.MarsErrorHandler
 import com.example.marsphotos.ui.screens.details.DetailsViewModel
 import com.example.marsphotos.ui.screens.home.HomeViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -31,8 +33,15 @@ val appModule = module {
         NetworkMarsPhotosRepository(get())
     }
 
+    single<ErrorHandler> {
+        MarsErrorHandler()
+    }
+
     viewModel {
-        HomeViewModel(get())
+        HomeViewModel(
+            get(),
+            get()
+        )
     }
 
     viewModel {
