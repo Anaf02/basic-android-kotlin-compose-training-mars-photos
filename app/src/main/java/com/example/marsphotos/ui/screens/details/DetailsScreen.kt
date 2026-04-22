@@ -10,13 +10,14 @@ import org.koin.androidx.compose.koinViewModel
 fun DetailsScreen(
     photoId: String,
     imageUrl: String,
-    setTopAppBarState: (TopAppBarState) -> Unit
+    setTopAppBarState: (TopAppBarState) -> Unit,
+    onNavigateBack: () -> Unit,
 ) {
     val viewModel = koinViewModel<DetailsViewModel>()
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     LaunchedEffect(key1 = Unit) {
-        setTopAppBarState(createTopAppBarState(photoId))
+        setTopAppBarState(createTopAppBarState(photoId, onNavigateBack))
     }
 
     DetailScreenContent(
@@ -27,7 +28,11 @@ fun DetailsScreen(
     )
 }
 
-private fun createTopAppBarState(photoId: String) = TopAppBarState(
+private fun createTopAppBarState(
+    photoId: String,
+    onNavigateBack: () -> Unit,
+) = TopAppBarState(
     title = "Image id: $photoId",
-    shouldDisplayBackButton = true
+    shouldDisplayBackButton = true,
+    onNavigateBack = onNavigateBack,
 )

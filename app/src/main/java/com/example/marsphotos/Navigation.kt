@@ -6,10 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import com.example.marsphotos.ui.components.TopAppBar
 import com.example.marsphotos.ui.components.TopAppBarState
 import com.example.marsphotos.ui.screens.details.DetailsScreen
@@ -18,46 +20,49 @@ import kotlinx.serialization.Serializable
 
 @Composable
 fun Navigation() {
-    val navController = rememberNavController()
+    val backStack = rememberNavBackStack(HomeRoute)
     val topAppBarState = remember { mutableStateOf(TopAppBarState()) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                navController = navController,
                 topAppBarState = topAppBarState,
                 modifier = Modifier
             )
         }
     ) { contentPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = HomeRoute,
-            modifier = Modifier.padding(contentPadding)
-        ) {
-            composable<HomeRoute> {
-                HomeScreen(
-                    setTopAppBarState = { topAppBarState.value = it },
-                    navigateToDetails = { (photoId, imageUrl) ->
-                        navController.navigate(DetailsRoute(photoId, imageUrl))
-                    }
-                )
+        NavDisplay(
+            backStack = backStack,
+            modifier = Modifier.padding(contentPadding),
+            onBack = { backStack.removeLastOrNull() },
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
+            entryProvider = entryProvider {
+                entry<HomeRoute> {
+                    HomeScreen(
+                        setTopAppBarState = { topAppBarState.value = it },
+                        navigateToDetails = { photo ->
+                            backStack.add(DetailsRoute(photo.id, photo.imageUrl))
+                        }
+                    )
+                }
+                entry<DetailsRoute> { route ->
+                    DetailsScreen(
+                        photoId = route.photoId,
+                        imageUrl = route.imageUrl,
+                        setTopAppBarState = { topAppBarState.value = it },
+                        onNavigateBack = { backStack.removeLastOrNull() }
+                    )
+                }
             }
-            composable<DetailsRoute> { backStackEntry ->
-                val detailsRoute = backStackEntry.toRoute<DetailsRoute>()
-
-                DetailsScreen(
-                    photoId = detailsRoute.photoId,
-                    imageUrl = detailsRoute.imageUrl,
-                    setTopAppBarState = { topAppBarState.value = it }
-                )
-            }
-        }
+        )
     }
 }
 
 @Serializable
-object HomeRoute
+data object HomeRoute : NavKey
 
 @Serializable
-data class DetailsRoute(val photoId: String, val imageUrl: String)
+data class DetailsRoute(val photoId: String, val imageUrl: String) : NavKey
